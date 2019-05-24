@@ -30,7 +30,10 @@ GetImage::GetImage(SmartACE::SmartComponent *comp)
     cfg.enable_stream(RS2_STREAM_COLOR, 640, 480, RS2_FORMAT_BGR8, 30);
     cfg.enable_stream(RS2_STREAM_DEPTH, 640, 480, RS2_FORMAT_Z16, 30);
     //Instruct pipeline to start streaming with the requested configuration
-    pipe.start(cfg);
+    profile = pipe.start(cfg);
+
+    auto sensor = profile.get_device().first<rs2::depth_sensor>();
+    depth_scale =  sensor.get_depth_scale();
 
 }
 GetImage::~GetImage() 
@@ -55,11 +58,28 @@ void GetImage::getrgbimage(DomainVision::CommVideoImage& comm_rgb_frame)
 void GetImage::getdepthimage(DomainVision::CommDepthImage& comm_depth_frame)
 {
 
+
 	rs2::depth_frame current_depth_frame = current_frameset.get_depth_frame();
+    // Query frame size (width and height)
+    const int frame_height = current_depth_frame.as<rs2::video_frame>().get_height();
+    const int frame_width = current_depth_frame.as<rs2::video_frame>().get_width();
+
+//    for (int x = 0;x < frame_width/2; x++)//To loop through all the pixels
+//        for (int y = 0; y < frame_height/2; y++)
+//        	if (current_depth_frame.get_distance(x,y) != 0)
+//        		std::cout<<current_depth_frame.get_distance(x,y)<<" ";
 
 	/*Read Current Frames*/
-	const uint16_t* depth_frame = (const uint16_t*) current_depth_frame.get_data();
+	uint16_t* depth_frame = (uint16_t*) current_depth_frame.get_data();
+	 std::cout << "The camera is facing an object " << depth_frame[240*640+320] << " meters away "<<std::endl;
+//	for (int i = 0;i < frame_width*frame_height; i++)
+//		depth_frame[i] = depth_frame[i]*depth_scale;
+//
+//	 std::cout << "The camera is facing an object1 " << depth_frame[240*640+320] << " meters away "<<std::endl;
+//	uint16_t * depth_frame = (uint16_t*)current_depth_frame.get_data();
 	//assert(rs_error_ != nullptr  && "error while reading depth stream");
+
+
 
 
 //	// BaseLine
@@ -73,18 +93,16 @@ void GetImage::getdepthimage(DomainVision::CommDepthImage& comm_depth_frame)
 	auto depth_frame_timestamp= current_depth_frame.get_timestamp();
 	auto depth_frame_number= current_depth_frame.get_frame_number();
 
-	int frame_height = current_depth_frame.get_height();
-	int frame_width  = current_depth_frame.get_width();
 
-//	comm_depth_frame.setWidth(depth_intrinsics.width);
-//	comm_depth_frame.setHeight(depth_intrinsics.height);
-
+	comm_depth_frame.setWidth(frame_width);
+	comm_depth_frame.setHeight(frame_height);
+	comm_depth_frame.setScale(depth_scale);
 	//std::cout << "depth height =" << comm_depth_frame.getHeight()<<"depth width  =" << comm_depth_frame.getWidth()<<std::endl;
 
 	comm_depth_frame.setFormat(DomainVision::DepthFormatType::UINT16);
 	comm_depth_frame.setPixel_size(16);
 	comm_depth_frame.setSeq_count(depth_frame_number);
-
+//
 	comm_depth_frame.set_distances(depth_frame, frame_width, frame_height);
 }
 
@@ -103,6 +121,8 @@ int GetImage::on_execute()
 	DomainVision::CommVideoImage comm_rgb_frame;
 	
 	current_frameset = pipe.wait_for_frames();
+
+
 	getrgbimage(comm_rgb_frame);
 	getdepthimage(comm_depth_frame);
 	COMP->rGBImagePushServiceOut->put(comm_rgb_frame);

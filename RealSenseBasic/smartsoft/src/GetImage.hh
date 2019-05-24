@@ -19,6 +19,7 @@
 
 #include "GetImageCore.hh"
 #include <librealsense2/rs.hpp>
+#include <opencv2/opencv.hpp>
 
 class GetImage  : public GetImageCore
 {
@@ -27,6 +28,12 @@ private:
     rs2::rates_printer printer;
     rs2::pipeline pipe;
     rs2::frameset current_frameset;
+
+    rs2::pipeline_profile profile;
+    rs2::device dev;
+//    rs2::depth_sensor ds;
+    float depth_scale;
+
 
     void getrgbimage(DomainVision::CommVideoImage& comm_rgb_frame);
     void getdepthimage(DomainVision::CommDepthImage& comm_depth_frame);

@@ -28,6 +28,7 @@ SMART_COMPONENT_PROJECT()
 #FIND_SMARTSOFT(3.0)
 #FIXME: generalize this
 FIND_PACKAGE(AceSmartSoft PATHS $ENV{SMART_ROOT_ACE}/build)
+find_package( OpenCV REQUIRED )
 
 # generte doxygen documentation
 SMART_COMPONENT_GENERATE_DOC()
@@ -75,7 +76,7 @@ INCLUDE(${CMAKE_CURRENT_LIST_DIR}/src-gen/MixedPortTargetConfigs.cmake)
 #################################################################################
 
 # SmartSoftKernel is one of the default dependencies for each component
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} AceSmartSoftKernel ${realsense2_LIBRARY})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} AceSmartSoftKernel ${realsense2_LIBRARY} ${OpenCV_LIBS})
 
 # automatically link to all dependent CommunicationObjects
 SMART_COMPONENT_AUTOLINK_DEPENDENCIES()
