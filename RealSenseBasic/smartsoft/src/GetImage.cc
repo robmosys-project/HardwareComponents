@@ -106,6 +106,42 @@ void GetImage::getdepthimage(DomainVision::CommDepthImage& comm_depth_frame)
 	comm_depth_frame.set_distances(depth_frame, frame_width, frame_height);
 }
 
+void GetImage::getpointcloud(DomainVision::Comm3dPointCloud& comm_pointcloud_frame, DomainVision::CommDepthImage comm_depth_frame)
+{
+	int img_width = comm_depth_frame.getWidth();
+	int img_height = comm_depth_frame.getHeight();
+	std::vector<CommBasicObjects::CommPosition3d> points;
+
+	float cx=308.2192687988281,  cy = 245.59515380859375; //rgb intrinsic
+	//float fx = 473.1015319824219, fy = 473.1015625;
+	float fx =  618.5377197265625, fy = 618.5377807617188;
+
+	//float* data = (float*) comm_depth_frame.get_distances_float();
+
+
+	rs2::depth_frame current_depth_frame = current_frameset.get_depth_frame();
+    // Query frame size (width and height)
+    const int frame_height = current_depth_frame.as<rs2::video_frame>().get_height();
+    const int frame_width = current_depth_frame.as<rs2::video_frame>().get_width();
+
+    for (int x = 0;x < frame_width; x++)//To loop through all the pixels
+           for (int y = 0; y < frame_height; y++)
+        	if (current_depth_frame.get_distance(x,y) != 0){
+				CommBasicObjects::CommPosition3d pt;
+				double ptx, pty, ptz;
+
+				ptz = current_depth_frame.get_distance(x,y);
+				ptx =  (x - cx)*ptz/fx;
+				pty =  (y - cy)*ptz/fy;
+
+				pt.setX(ptx);	pt.setY(pty);	pt.setZ(ptz);
+				points.push_back(pt);
+		}
+
+	comm_pointcloud_frame.setPoints(points);
+	std:: cout << "New PC "  <<std::endl;
+}
+
 int GetImage::on_entry()
 {
 	// do initialization procedures here, which are called once, each time the task is started
@@ -119,13 +155,17 @@ int GetImage::on_execute()
 	DomainVision::CommRGBDImage rgbd_frame;
 	DomainVision::CommDepthImage comm_depth_frame;
 	DomainVision::CommVideoImage comm_rgb_frame;
+	DomainVision::Comm3dPointCloud comm_pointcloud_frame;
 	
 	current_frameset = pipe.wait_for_frames();
 
 
 	getrgbimage(comm_rgb_frame);
 	getdepthimage(comm_depth_frame);
+	getpointcloud(comm_pointcloud_frame, comm_depth_frame);
+
 	COMP->rGBImagePushServiceOut->put(comm_rgb_frame);
+	COMP->pointCloudPushServiceOut->put(comm_pointcloud_frame);
 
 	rgbd_frame.setColor_image(comm_rgb_frame);
 	rgbd_frame.setDepth_image(comm_depth_frame);

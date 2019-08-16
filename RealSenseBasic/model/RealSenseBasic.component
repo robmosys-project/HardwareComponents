@@ -9,4 +9,6 @@ Activity GetImage
 	}
 OutputPort RGBImagePushServiceOut implements DomainVision.RGBImagePushService realizedBy GetImage {
 	}
+OutputPort PointCloudPushServiceOut implements DomainVision.PointCloudPushService realizedBy GetImage {
+	}
 }

@@ -37,6 +37,7 @@ private:
 
     void getrgbimage(DomainVision::CommVideoImage& comm_rgb_frame);
     void getdepthimage(DomainVision::CommDepthImage& comm_depth_frame);
+    void getpointcloud(DomainVision::Comm3dPointCloud& comm_pointcloud_frame, DomainVision::CommDepthImage comm_depth_frame);
 public:
 	GetImage(SmartACE::SmartComponent *comp);
 	virtual ~GetImage();

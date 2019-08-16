@@ -41,3 +41,4 @@ smartsoft/build/
 *.json
 *.cxx
 
+/Release/
