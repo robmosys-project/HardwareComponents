@@ -1,0 +1,13 @@
+ComponentDefinition SensorZR300 logo "/SensorZR300/model/logo.png"
+{
+
+Activity GetImage
+	{
+	}
+	OutputPort RGBImagePushServiceOut implements DomainVision.RGBImagePushService realizedBy GetImage {
+	}
+	OutputPort RGBDImagePushServiceOut implements DomainVision.RGBDImagePushService realizedBy GetImage {
+	}
+	OutputPort PointCloudPushServiceOut implements DomainVision.PointCloudPushService realizedBy GetImage {
+	}
+}
