@@ -136,7 +136,7 @@
         </edges>
       </data>
     </ownedAnnotationEntries>
-    <ownedDiagramElements xmi:type="diagram:DNodeContainer" uid="_vHkIIMidEem9-N-bLrY9Mg" name="SensorZR300" tooltipText="ComponentDefinition">
+    <ownedDiagramElements xmi:type="diagram:DNodeContainer" uid="_vHkIIMidEem9-N-bLrY9Mg" name="SensorZR300" tooltipText="ComponentDefinition: SensorZR300&#xA;">
       <target xmi:type="ComponentDefinition:ComponentDefinition" href="model/SensorZR300.component#//@component"/>
       <semanticElements xmi:type="ComponentDefinition:ComponentDefinition" href="model/SensorZR300.component#//@component"/>
       <ownedBorderedNodes xmi:type="diagram:DNode" uid="_XGJ5kMjJEemjObO1qoka_g" name="RGBImagePushServiceOut" tooltipText="OutputPort" incomingEdges="_XGaYQMjJEemjObO1qoka_g" width="3" height="3" resizeKind="NSEW">
